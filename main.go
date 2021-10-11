@@ -29,10 +29,16 @@ func init() {
 
 func main() {
 	var err error
+
+	gitHost := os.Getenv("GITLAB_HOST")
+	if gitHost == "" {
+		gitHost = "https://gitlab.com"
+	}
+
 	if token, exists := os.LookupEnv("GITLAB_TOKEN"); !exists {
 		log.Fatal("GITLAB_TOKEN env var not set")
 	} else {
-		clinar.Client, err = gitlab.NewClient(token)
+		clinar.Client, err = gitlab.NewClient(token, gitlab.WithBaseURL(gitHost))
 		if err != nil {
 			log.Fatalf("Failed to create client: %v", err)
 		}
