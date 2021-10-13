@@ -66,8 +66,17 @@ func main() {
 		}
 	} else {
 		if len(clinar.StaleRunnerIDs) > 0 {
+			fmt.Println()
 			for _, rner := range clinar.StaleRunnerIDs {
-				fmt.Printf("%d - %s - %s - %t\n", rner.ID, rner.RunnerType, rner.Description, rner.Online)
+				groups := []string{}
+				for _, grp := range rner.Groups {
+					groups = append(groups, grp.Name)
+				}
+				projects := []string{}
+				for _, proj := range rner.Projects {
+					projects = append(projects, proj.Name)
+				}
+				fmt.Printf("%d - %s - %s - %t - %s - %s\n", rner.ID, rner.RunnerType, rner.Description, rner.Online, groups, projects)
 			}
 		} else {
 			fmt.Println("No stale runners found!")
