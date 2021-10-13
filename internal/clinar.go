@@ -126,7 +126,7 @@ func (c *Clinar) CleanupRunners() error {
 	}
 
 	for _, rner := range c.StaleRunnerIDs {
-		fmt.Printf("Deleting %d ", rner.ID)
+		fmt.Printf("Deleting %d - %s", rner.ID, rner.Name)
 		resp, err := c.Runners.DeleteRegisteredRunnerByID(rner.ID)
 		if err != nil {
 			return err
