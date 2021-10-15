@@ -8,21 +8,8 @@ import (
 
 type Clinar struct {
 	*gitlab.Client
-	GroupIDs       []int
-	ProjectIDs     []int
 	StaleRunnerIDs []*gitlab.RunnerDetails
-}
-
-func (r *Clinar) appendGrpIds(grps []*gitlab.Group) {
-	for _, grp := range grps {
-		r.GroupIDs = append(r.GroupIDs, grp.ID)
-	}
-}
-
-func (r *Clinar) appendProjIds(projs []*gitlab.Project) {
-	for _, proj := range projs {
-		r.ProjectIDs = append(r.ProjectIDs, proj.ID)
-	}
+	Filter         []string
 }
 
 func (r *Clinar) appendRunnerIds(rners []*gitlab.Runner) {
@@ -33,57 +20,6 @@ func (r *Clinar) appendRunnerIds(rners []*gitlab.Runner) {
 		}
 		r.StaleRunnerIDs = append(r.StaleRunnerIDs, details)
 	}
-}
-
-func (c *Clinar) GetAllGroups() error {
-	opts := &gitlab.ListGroupsOptions{
-		Owned: gitlab.Bool(true),
-		ListOptions: gitlab.ListOptions{
-			PerPage: 100,
-			Page:    1,
-		},
-	}
-
-	for {
-		grps, resp, err := c.Groups.ListGroups(opts)
-		if err != nil {
-			return err
-		}
-		c.appendGrpIds(grps)
-		// Exit the loop when we've seen all pages.
-		if resp.CurrentPage >= resp.TotalPages {
-			break
-		}
-		// Update the page number to get the next page.
-		opts.Page = resp.NextPage
-	}
-	return nil
-}
-
-func (c *Clinar) GetAllProjects() error {
-	opts := &gitlab.ListProjectsOptions{
-		Archived: gitlab.Bool(false),
-		Owned:    gitlab.Bool(true),
-		ListOptions: gitlab.ListOptions{
-			PerPage: 100,
-			Page:    1,
-		},
-	}
-
-	for {
-		projs, resp, err := c.Projects.ListProjects(opts)
-		if err != nil {
-			return err
-		}
-		c.appendProjIds(projs)
-
-		if resp.CurrentPage >= resp.TotalPages {
-			break
-		}
-
-		opts.Page = resp.NextPage
-	}
-	return nil
 }
 
 func (c *Clinar) GetAllRunners() error {

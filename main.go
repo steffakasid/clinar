@@ -17,8 +17,6 @@ var (
 )
 
 var clinar *internal.Clinar = &internal.Clinar{
-	GroupIDs:       []int{},
-	ProjectIDs:     []int{},
 	StaleRunnerIDs: []*gitlab.RunnerDetails{},
 }
 
@@ -44,15 +42,6 @@ func main() {
 		}
 	}
 
-	// err = clinar.GetAllGroups()
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// err = clinar.GetAllProjects()
-	// if err != nil {
-	// 	panic(err)
-	// }
 	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
 	s.Start()
 	err = clinar.GetAllRunners()
