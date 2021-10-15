@@ -14,6 +14,7 @@ import (
 
 var (
 	approve bool
+	filter  []string
 )
 
 var clinar *internal.Clinar = &internal.Clinar{
@@ -22,6 +23,7 @@ var clinar *internal.Clinar = &internal.Clinar{
 
 func init() {
 	flag.BoolVarP(&approve, "approve", "a", false, "Acknowledge to purge all stale runners")
+	flag.StringArrayVarP(&filter, "filter", "f", nil, "Filter out runners with specified groups/projects. Filter can be given by id or name")
 	flag.Parse()
 }
 

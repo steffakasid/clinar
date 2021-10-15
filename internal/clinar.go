@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/xanzy/go-gitlab"
 )
@@ -62,12 +63,41 @@ func (c *Clinar) CleanupRunners() error {
 	}
 
 	for _, rner := range c.StaleRunnerIDs {
-		fmt.Printf("Deleting %d - %s", rner.ID, rner.Name)
-		resp, err := c.Runners.DeleteRegisteredRunnerByID(rner.ID)
-		if err != nil {
-			return err
+		grpsNprojs := []abstractRunnerLocation{}
+		for _, grp := range rner.Groups {
+			grpsNprojs = append(grpsNprojs, abstractRunnerLocation{grp.ID, grp.Name})
 		}
-		fmt.Printf("returned status %s\n", resp.Status)
+		for _, proj := range rner.Projects {
+			grpsNprojs = append(grpsNprojs, abstractRunnerLocation{proj.ID, proj.Name})
+		}
+		if c.isFilteredOut(grpsNprojs) {
+			fmt.Printf("Skipping %d", rner.ID)
+		} else {
+			fmt.Printf("Deleting %d - %s", rner.ID, rner.Name)
+			resp, err := c.Runners.DeleteRegisteredRunnerByID(rner.ID)
+			if err != nil {
+				return err
+			}
+			fmt.Printf("returned status %s\n", resp.Status)
+		}
 	}
 	return nil
+}
+
+type abstractRunnerLocation struct {
+	id   int
+	name string
+}
+
+func (c Clinar) isFilteredOut(locations []abstractRunnerLocation) bool {
+	for _, filter := range c.Filter {
+		for _, loc := range locations {
+			if filter == loc.name {
+				return true
+			} else if filter == strconv.Itoa(loc.id) {
+				return true
+			}
+		}
+	}
+	return false
 }
