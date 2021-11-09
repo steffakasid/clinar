@@ -13,13 +13,24 @@ type Clinar struct {
 	Filter         []string
 }
 
-func (r *Clinar) appendRunnerIds(rners []*gitlab.Runner) {
+func (c *Clinar) appendRunnerIds(rners []*gitlab.Runner) {
 	for _, rner := range rners {
-		details, _, err := r.Runners.GetRunnerDetails(rner.ID)
+		details, _, err := c.Runners.GetRunnerDetails(rner.ID)
 		if err != nil {
 			fmt.Printf("Error %s getting runner details for runner ID %d\n", err, rner.ID)
 		}
-		r.StaleRunnerIDs = append(r.StaleRunnerIDs, details)
+		grpsNprojs := []abstractRunnerLocation{}
+		for _, grp := range details.Groups {
+			grpsNprojs = append(grpsNprojs, abstractRunnerLocation{grp.ID, grp.Name})
+		}
+		for _, proj := range details.Projects {
+			grpsNprojs = append(grpsNprojs, abstractRunnerLocation{proj.ID, proj.Name})
+		}
+		if c.isFilteredOut(grpsNprojs) {
+			fmt.Printf("Skipping %d", rner.ID)
+		} else {
+			c.StaleRunnerIDs = append(c.StaleRunnerIDs, details)
+		}
 	}
 }
 
@@ -63,23 +74,12 @@ func (c *Clinar) CleanupRunners() error {
 	}
 
 	for _, rner := range c.StaleRunnerIDs {
-		grpsNprojs := []abstractRunnerLocation{}
-		for _, grp := range rner.Groups {
-			grpsNprojs = append(grpsNprojs, abstractRunnerLocation{grp.ID, grp.Name})
+		fmt.Printf("Deleting %d - %s", rner.ID, rner.Name)
+		resp, err := c.Runners.DeleteRegisteredRunnerByID(rner.ID)
+		if err != nil {
+			return err
 		}
-		for _, proj := range rner.Projects {
-			grpsNprojs = append(grpsNprojs, abstractRunnerLocation{proj.ID, proj.Name})
-		}
-		if c.isFilteredOut(grpsNprojs) {
-			fmt.Printf("Skipping %d", rner.ID)
-		} else {
-			fmt.Printf("Deleting %d - %s", rner.ID, rner.Name)
-			resp, err := c.Runners.DeleteRegisteredRunnerByID(rner.ID)
-			if err != nil {
-				return err
-			}
-			fmt.Printf("returned status %s\n", resp.Status)
-		}
+		fmt.Printf("returned status %s\n", resp.Status)
 	}
 	return nil
 }

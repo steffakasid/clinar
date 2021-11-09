@@ -44,6 +44,10 @@ func main() {
 		}
 	}
 
+	if len(filter) > 0 {
+		clinar.Filter = filter
+	}
+
 	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
 	s.Start()
 	err = clinar.GetAllRunners()
