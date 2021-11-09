@@ -27,6 +27,35 @@ func init() {
 	flag.BoolVarP(&approve, "approve", "a", false, "Acknowledge to purge all stale runners")
 	flag.StringArrayVarP(&excludeFilter, "exclude", "e", nil, "Filter out runners with specified groups/projects. Filter can be given by id or name. Exclude takes precedences before include.")
 	flag.StringVarP(&includePattern, "include", "i", "", "Regular expression include filter. Matches on project and group names. If runner is set one group or project this runner will be included.")
+
+	flag.Usage = func() {
+		w := os.Stderr
+
+		fmt.Fprintf(w, "Usage of %s: \n", os.Args[0])
+		fmt.Fprintln(w, `
+This tool basically get's all offline runners which a user can administer. 
+If you don't provide the '--approve' flag the tool just shows all runners 
+which are offline with some additional information. After you provide the
+'--approve' flag all offline runners are deleted.
+
+Usage:
+  clinar [flags]
+
+Variables:
+  - GITLAB_TOKEN   - the GitLab token to access the Gitlab instance
+  - GITLAB_HOST    - the GitLab host which should be accessed [Default: https://gitlab.com]
+
+Examples:
+  clinar                       - get all stale runners which can be administred by the GITLAB_TOKEN
+  clinar --approve             - cleanup all stal runners which can be administred by the GITLAB_TOKEN 
+  clinar --exclude 1234        - get all stale runners which can be administred by the GITLAB_TOKEN. Excluding project or group with ID 1234.
+  clinar --include ^prefix.*   - get alle stale runners which are set on a group / project where the name matches ^prefix.*
+
+Flags:`)
+
+		flag.PrintDefaults()
+	}
+
 	flag.Parse()
 }
 

@@ -1,0 +1,19 @@
+# clinar - A tool to cleanup stale gitlab runners
+
+This tool basically get's all offline runners which a user can administer. If you don't provide the `--approve` flag the tool just shows all runners which are offline with some additional information. After you provide the `--approve` flag all offline runners are deleted.
+
+## Flags and Config Options
+
+.Usage
+  clinar [flags]
+
+.Environment Variables
+
+GITLAB_HOST:: set the GitLab host to be able to run against self hosted GitLab instances [Default: https://gitlab.com]
+GITLAB_TOKEN:: GitLab token to access the GitLab API. To view runners read_api should be sufficient. To cleanup stale runners you must have full API access.
+
+.Flags
+
+--approve, -a:: Boolean flag to toggle approve. If you provide this flag stale runners are deleted.
+--exclude, -e:: String[] flag (can be provided multiple times). Define projects/ groups based on their names or ids which are excluded. This flag takes precedences before include. If one group/ project is excluded the full runner is excluded from the cleanup list.
+--include, -i:: String flag to define a regular expressions for projects/ groups which should be included. If one group/ project is included the runner is included into the cleanup list.
