@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"time"
 
 	"github.com/briandowns/spinner"
@@ -13,8 +14,9 @@ import (
 )
 
 var (
-	approve bool
-	filter  []string
+	approve        bool
+	excludeFilter  []string
+	includePattern string
 )
 
 var clinar *internal.Clinar = &internal.Clinar{
@@ -23,7 +25,8 @@ var clinar *internal.Clinar = &internal.Clinar{
 
 func init() {
 	flag.BoolVarP(&approve, "approve", "a", false, "Acknowledge to purge all stale runners")
-	flag.StringArrayVarP(&filter, "filter", "f", nil, "Filter out runners with specified groups/projects. Filter can be given by id or name")
+	flag.StringArrayVarP(&excludeFilter, "exclude", "e", nil, "Filter out runners with specified groups/projects. Filter can be given by id or name. Exclude takes precedences before include.")
+	flag.StringVarP(&includePattern, "include", "i", "", "Regular expression include filter. Matches on project and group names. If runner is set one group or project this runner will be included.")
 	flag.Parse()
 }
 
@@ -44,11 +47,19 @@ func main() {
 		}
 	}
 
-	if len(filter) > 0 {
-		clinar.Filter = filter
+	if len(excludeFilter) > 0 {
+		clinar.ExcludeFilter = excludeFilter
 	}
 
-	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+	if includePattern != "" {
+		rex, err := regexp.Compile(includePattern)
+		if err != nil {
+			panic(err)
+		}
+		clinar.IncludePattern = rex
+	}
+
+	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
 	s.Start()
 	err = clinar.GetAllRunners()
 	if err != nil {
@@ -60,22 +71,26 @@ func main() {
 			panic(err)
 		}
 	} else {
-		if len(clinar.StaleRunnerIDs) > 0 {
-			fmt.Println()
-			for _, rner := range clinar.StaleRunnerIDs {
-				groups := []string{}
-				for _, grp := range rner.Groups {
-					groups = append(groups, grp.Name)
-				}
-				projects := []string{}
-				for _, proj := range rner.Projects {
-					projects = append(projects, proj.Name)
-				}
-				fmt.Printf("%d - %s - %s - %t - %s - %s\n", rner.ID, rner.RunnerType, rner.Description, rner.Online, groups, projects)
-			}
-		} else {
-			fmt.Println("No stale runners found!")
-		}
+		printFoundRunenrs()
 	}
 	s.Stop()
+}
+
+func printFoundRunenrs() {
+	if len(clinar.StaleRunnerIDs) > 0 {
+		fmt.Println()
+		for _, rner := range clinar.StaleRunnerIDs {
+			groups := []string{}
+			for _, grp := range rner.Groups {
+				groups = append(groups, grp.Name)
+			}
+			projects := []string{}
+			for _, proj := range rner.Projects {
+				projects = append(projects, proj.Name)
+			}
+			fmt.Printf("%d - %s - %s - %t - %s - %s\n", rner.ID, rner.RunnerType, rner.Description, rner.Online, groups, projects)
+		}
+	} else {
+		fmt.Println("No stale runners found!")
+	}
 }

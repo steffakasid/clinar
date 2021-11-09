@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 
 	"github.com/xanzy/go-gitlab"
@@ -10,7 +11,8 @@ import (
 type Clinar struct {
 	*gitlab.Client
 	StaleRunnerIDs []*gitlab.RunnerDetails
-	Filter         []string
+	ExcludeFilter  []string
+	IncludePattern *regexp.Regexp
 }
 
 func (c *Clinar) appendRunnerIds(rners []*gitlab.Runner) {
@@ -29,7 +31,9 @@ func (c *Clinar) appendRunnerIds(rners []*gitlab.Runner) {
 		if c.isFilteredOut(grpsNprojs) {
 			fmt.Printf("Skipping %d", rner.ID)
 		} else {
-			c.StaleRunnerIDs = append(c.StaleRunnerIDs, details)
+			if c.isIncluded(grpsNprojs) {
+				c.StaleRunnerIDs = append(c.StaleRunnerIDs, details)
+			}
 		}
 	}
 }
@@ -90,11 +94,24 @@ type abstractRunnerLocation struct {
 }
 
 func (c Clinar) isFilteredOut(locations []abstractRunnerLocation) bool {
-	for _, filter := range c.Filter {
+	for _, filter := range c.ExcludeFilter {
 		for _, loc := range locations {
 			if filter == loc.name {
 				return true
 			} else if filter == strconv.Itoa(loc.id) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (c Clinar) isIncluded(locations []abstractRunnerLocation) bool {
+	if c.IncludePattern == nil {
+		return true
+	} else {
+		for _, loc := range locations {
+			if c.IncludePattern.MatchString(loc.name) {
 				return true
 			}
 		}
