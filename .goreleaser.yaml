@@ -44,5 +44,7 @@ brews:
     commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
 
     folder: Formula
-    description: "A tool to cleanup stale gitlab runners."
+
+    homepage: "https://github.com/steffakasid/clinar"
+    description: "This tool can cleanup stale gitlab runners."
     license: "Apache-2.0"
