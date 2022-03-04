@@ -100,12 +100,12 @@ func main() {
 			panic(err)
 		}
 	} else {
-		printFoundRunenrs()
+		printFoundRunners()
 	}
 	s.Stop()
 }
 
-func printFoundRunenrs() {
+func printFoundRunners() {
 	if len(clinar.StaleRunnerIDs) > 0 {
 		fmt.Println()
 		for _, rner := range clinar.StaleRunnerIDs {

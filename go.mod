@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/briandowns/spinner v1.18.1
+	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/xanzy/go-gitlab v0.55.1
 )
