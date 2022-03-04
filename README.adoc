@@ -17,3 +17,27 @@ GITLAB_TOKEN:: GitLab token to access the GitLab API. To view runners read_api s
 --approve, -a:: Boolean flag to toggle approve. If you provide this flag stale runners are deleted.
 --exclude, -e:: String[] flag (can be provided multiple times). Define projects/ groups based on their names or ids which are excluded. This flag takes precedences before include. If one group/ project is excluded the full runner is excluded from the cleanup list.
 --include, -i:: String flag to define a regular expressions for projects/ groups which should be included. If one group/ project is included the runner is included into the cleanup list.
+
+## Using sops encrypted config file
+
+You can now provide a link:https://github.com/mozilla/sops[sops] encrypted config file. To create one you need any supported encryption key e.g. gpg and encrypt your file like the following:
+
+.Encrpting config
+[source,sh]
+----
+❯ sops --pgp=<GPG Fingerprint> --input-type yaml --output-type yaml $HOME/.clinar
+----
+
+NOTE: You can also add the yaml extension to the filename: $HOME/.clinar.yaml in that case you don't need to specify `--input-type` and `--output-type`
+
+GPG Fingerprint:: Your gpg fingerprint you can find out with `gpg --list-keys`
+
+You can set any flag or env var within the config e.g.:
+.Content of config file
+[source.yaml]
+----
+GITLAB_TOKEN: <gitlab personal token>
+GITLAB_HOST: <custom gitlab host>
+----
+gitlab personal token:: A gitlab personal token can be created in your user profile in GitLab
+custom gitlab host:: If necessary you can set a custom gitlab host (e.g. a company private one)
