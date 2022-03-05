@@ -2,6 +2,7 @@ package internal
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path"
 
@@ -39,25 +40,51 @@ func InitConfig() {
 	viper.SetConfigName(configFileName)
 
 	viper.AutomaticEnv()
+	setLogLevel()
 
-	cleartext, err := decrypt.File(path.Join(home, configFileName), configFileType)
+	usedConfigFile := getConfigFilename(home)
+	if usedConfigFile != "" {
+		cleartext, err := decrypt.File(usedConfigFile, configFileType)
 
-	if err != nil {
-		logger.Warnf("Error encrypting. %s. Maybe you're not using an encrypted config?", err)
-		if err := viper.ReadInConfig(); err != nil {
-			logger.Warnf("Error reading config. %s. Are you using a config?", err)
+		if err != nil {
+			logger.Warnf("Error encrypting. %s. Maybe you're not using an encrypted config?", err)
+			if err := viper.ReadInConfig(); err != nil {
+				logger.Warnf("Error reading config. %s. Are you using a config?", err)
+			} else {
+				setLogLevel()
+				logger.Debug("Using config file:", viper.ConfigFileUsed())
+			}
 		} else {
-			setLogLevel()
-			logger.Debug("Using config file:", viper.ConfigFileUsed())
+			if err := viper.ReadConfig(bytes.NewBuffer(cleartext)); err != nil {
+				logger.Fatal(err)
+			} else {
+				setLogLevel()
+				logger.Debug("Using sops encrypted config file:", viper.ConfigFileUsed())
+			}
 		}
 	} else {
-		if err := viper.ReadConfig(bytes.NewBuffer(cleartext)); err != nil {
-			logger.Fatal(err)
-		} else {
-			setLogLevel()
-			logger.Debug("Using sops encrypted config file:", viper.ConfigFileUsed())
-		}
+		logger.Debug("No config file used!")
 	}
+}
+
+func getConfigFilename(homedir string) string {
+	pathWithoutExt := path.Join(homedir, configFileName)
+	logger.Debugf("Check if %s exists", pathWithoutExt)
+	if _, err := os.Stat(pathWithoutExt); err == nil {
+		return pathWithoutExt
+	}
+
+	pathWithExt := fmt.Sprintf("%s.%s", pathWithoutExt, configFileType)
+	logger.Debugf("Check if %s exists", pathWithExt)
+	if _, err := os.Stat(pathWithExt); err == nil {
+		return pathWithExt
+	}
+	pathWithExt = fmt.Sprintf("%s.%s", pathWithoutExt, "yml")
+	logger.Debugf("Check if %s exists", pathWithExt)
+	if _, err := os.Stat(pathWithExt); err == nil {
+		return pathWithExt
+	}
+	return ""
 }
 
 func setLogLevel() {
