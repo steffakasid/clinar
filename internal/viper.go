@@ -47,7 +47,7 @@ func InitConfig() {
 		cleartext, err := decrypt.File(usedConfigFile, configFileType)
 
 		if err != nil {
-			logger.Warnf("Error encrypting. %s. Maybe you're not using an encrypted config?", err)
+			logger.Warnf("Error decrypting. %s. Maybe you're not using an encrypted config?", err)
 			if err := viper.ReadInConfig(); err != nil {
 				logger.Warnf("Error reading config. %s. Are you using a config?", err)
 			} else {
