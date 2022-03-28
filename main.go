@@ -2,19 +2,19 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
-	"regexp"
 	"time"
 
 	"github.com/briandowns/spinner"
+	"github.com/sirupsen/logrus"
+	logger "github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"github.com/steffakasid/clinar/internal"
 	"github.com/xanzy/go-gitlab"
 )
 
-var clinar *internal.Clinar = &internal.Clinar{}
+var clinar *internal.Clinar = &internal.Clinar{Logger: logrus.New()}
 
 func init() {
 	flag.BoolP(APPROVE, "a", false, "Acknowledge to purge all stale runners")
@@ -61,35 +61,34 @@ func main() {
 	var err error
 
 	if viper.GetString(GTILAB_TOKEN) == "" {
-		log.Fatal("GITLAB_TOKEN env var not set")
+		logger.Fatal("GITLAB_TOKEN env var not set")
 	} else {
 		gitLabClient, err := gitlab.NewClient(viper.GetString(GTILAB_TOKEN), gitlab.WithBaseURL(viper.GetString(GITLAB_HOST)))
 		if err != nil {
-			log.Fatalf("Failed to create client: %v", err)
+			logger.Fatalf("Failed to create client: %v", err)
 		}
 		clinar.Client = gitLabClient.Runners
 	}
 
 	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
 	s.Start()
-	err = clinar.GetAllRunners()
+	rners, err := clinar.GetAllRunners()
 	if err != nil {
-		panic(err)
+		logger.Fatal(err)
 	}
+	rnerDetails := clinar.GetRunnerDetails(rners)
 	if viper.GetBool(APPROVE) {
-		if err != nil {
-			panic(err)
-		}
+		clinar.CleanupRunners(rnerDetails)
 	} else {
-		printFoundRunners()
+		printFoundRunners(rnerDetails)
 	}
 	s.Stop()
 }
 
-func printFoundRunners() {
-	if len(clinar.StaleRunnerIDs) > 0 {
+func printFoundRunners(staleRunnerIds []*gitlab.RunnerDetails) {
+	if len(staleRunnerIds) > 0 {
 		fmt.Println()
-		for _, rner := range clinar.StaleRunnerIDs {
+		for _, rner := range staleRunnerIds {
 			groups := []string{}
 			for _, grp := range rner.Groups {
 				groups = append(groups, grp.Name)
