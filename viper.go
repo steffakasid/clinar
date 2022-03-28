@@ -1,10 +1,11 @@
-package internal
+package main
 
 import (
 	"bytes"
 	"fmt"
 	"os"
 	"path"
+	"regexp"
 
 	logger "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -21,6 +22,7 @@ const (
 	GITLAB_HOST  = "GITLAB_HOST"
 	GTILAB_TOKEN = "GITLAB_TOKEN"
 	APPROVE      = "approve"
+	EXCLUDE      = "exclude"
 	INCLUDE      = "include"
 	LOG_LEVEL    = "LOG_LEVEL"
 )
@@ -64,6 +66,16 @@ func InitConfig() {
 		}
 	} else {
 		logger.Debug("No config file used!")
+	}
+
+	clinar.ExcludeFilter = viper.GetStringSlice("exclude")
+
+	if viper.GetString(INCLUDE) != "" {
+		rex, err := regexp.Compile(viper.GetString(INCLUDE))
+		if err != nil {
+			logger.Fatal(err)
+		}
+		clinar.IncludePattern = rex
 	}
 }
 
