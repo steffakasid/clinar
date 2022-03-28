@@ -5,43 +5,56 @@ import (
 	"strconv"
 	"sync"
 
-	logger "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/xanzy/go-gitlab"
 )
 
 const runnerState = "offline"
 
-type Clinar struct {
-	*gitlab.Client
-	StaleRunnerIDs []*gitlab.RunnerDetails
-	ExcludeFilter  []string
-	IncludePattern *regexp.Regexp
+type GitLabClient interface {
+	GetRunnerDetails(rid interface{}, options ...gitlab.RequestOptionFunc) (*gitlab.RunnerDetails, *gitlab.Response, error)
+	ListRunners(opt *gitlab.ListRunnersOptions, options ...gitlab.RequestOptionFunc) ([]*gitlab.Runner, *gitlab.Response, error)
+	DeleteRegisteredRunnerByID(rid int, options ...gitlab.RequestOptionFunc) (*gitlab.Response, error)
 }
 
-func (c *Clinar) appendRunnerIds(rners []*gitlab.Runner) {
+type Clinar struct {
+	Client         GitLabClient
+	Logger         *logrus.Logger
+	ExcludeFilter  []string       `mapstructure:"exclude"`
+	IncludePattern *regexp.Regexp `mapstructure:"include"`
+}
+
+// GetRunnerDetails return the gitlab.RunnerDetails for all given []*gitlab.Runner
+func (c *Clinar) GetRunnerDetails(rners []*gitlab.Runner) []*gitlab.RunnerDetails {
+	runnerDetails := []*gitlab.RunnerDetails{}
+	// TODO: We could get Details in Chunks with goroutines
 	for _, rner := range rners {
-		details, _, err := c.Runners.GetRunnerDetails(rner.ID)
+		details, _, err := c.Client.GetRunnerDetails(rner.ID)
 		if err != nil {
-			logger.Errorf("Error %s getting runner details for runner ID %d", err, rner.ID)
-		}
-		grpsNprojs := []abstractRunnerLocation{}
-		for _, grp := range details.Groups {
-			grpsNprojs = append(grpsNprojs, abstractRunnerLocation{grp.ID, grp.Name})
-		}
-		for _, proj := range details.Projects {
-			grpsNprojs = append(grpsNprojs, abstractRunnerLocation{proj.ID, proj.Name})
-		}
-		if c.isFilteredOut(grpsNprojs) {
-			logger.Infof("Skipping %d", rner.ID)
+			c.Logger.Errorf("Error %s getting runner details for runner ID %d", err, rner.ID)
 		} else {
-			if c.isIncluded(grpsNprojs) {
-				c.StaleRunnerIDs = append(c.StaleRunnerIDs, details)
+			grpsNprojs := []abstractRunnerLocation{}
+			for _, grp := range details.Groups {
+				grpsNprojs = append(grpsNprojs, abstractRunnerLocation{grp.ID, grp.Name})
+			}
+			for _, proj := range details.Projects {
+				grpsNprojs = append(grpsNprojs, abstractRunnerLocation{proj.ID, proj.Name})
+			}
+			if c.isExcluded(grpsNprojs) {
+				c.Logger.Infof("Skipping %d", rner.ID)
+			} else {
+				if c.isIncluded(grpsNprojs) {
+					runnerDetails = append(runnerDetails, details)
+				}
 			}
 		}
 	}
+	return runnerDetails
 }
 
-func (c *Clinar) GetAllRunners() error {
+func (c *Clinar) GetAllRunners() ([]*gitlab.Runner, error) {
+	runners := []*gitlab.Runner{}
+
 	opts := &gitlab.ListRunnersOptions{
 		ListOptions: gitlab.ListOptions{
 			PerPage: 100,
@@ -50,11 +63,11 @@ func (c *Clinar) GetAllRunners() error {
 		Status: gitlab.String(runnerState),
 	}
 
-	rners, resp, err := c.Runners.ListRunners(opts)
+	rners, resp, err := c.Client.ListRunners(opts)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	c.appendRunnerIds(rners)
+	runners = append(runners, rners...)
 
 	results := make(chan listRunnerResultWrapper, resp.TotalPages)
 	var wg sync.WaitGroup
@@ -68,41 +81,30 @@ func (c *Clinar) GetAllRunners() error {
 
 	for rnerResult := range results {
 		if rnerResult.err != nil {
-			logger.Error(err)
+			c.Logger.Error(rnerResult.err)
+		} else {
+			runners = append(runners, rners...)
 		}
-		c.appendRunnerIds(rners)
 	}
 
-	return nil
-}
-
-type listRunnerResultWrapper struct {
-	rners []*gitlab.Runner
-	err   error
+	return runners, nil
 }
 
 func (c Clinar) wrapListRunners(opts gitlab.ListRunnersOptions, results chan<- listRunnerResultWrapper, wg *sync.WaitGroup) {
-	rners, _, err := c.Runners.ListRunners(&opts)
+	rners, _, err := c.Client.ListRunners(&opts)
 	results <- listRunnerResultWrapper{rners, err}
 	wg.Done()
 }
 
-func (c *Clinar) CleanupRunners() error {
-	if len(c.StaleRunnerIDs) <= 0 {
-		err := c.GetAllRunners()
-		if err != nil {
-			return err
-		}
+func (c *Clinar) CleanupRunners(staleRunnerIDs []*gitlab.RunnerDetails) {
+	if len(staleRunnerIDs) == 0 {
+		c.Logger.Info("No runners to be purged!")
 	}
 
-	if len(c.StaleRunnerIDs) == 0 {
-		logger.Info("No runners to be purged!")
-		return nil
-	}
-
-	result := make(chan responseWrapper, len(c.StaleRunnerIDs))
+	result := make(chan responseWrapper, len(staleRunnerIDs))
 	var wg sync.WaitGroup
-	for _, rner := range c.StaleRunnerIDs {
+	for _, rner := range staleRunnerIDs {
+		c.Logger.Infof("Deleting %d - %s", rner.ID, rner.Name)
 		wg.Add(1)
 		c.wrapDeleteRegisteredRunnerById(*rner, result, &wg)
 	}
@@ -111,32 +113,19 @@ func (c *Clinar) CleanupRunners() error {
 
 	for deleteResult := range result {
 		if deleteResult.err != nil {
-			logger.Error(deleteResult.err)
+			c.Logger.Error(deleteResult.err)
 		}
-		logger.Debugf("DeleteRegisteredRunnerByID returned status %s\n", deleteResult.resp.Status)
+		c.Logger.Debugf("DeleteRegisteredRunnerByID returned status %s\n", deleteResult.resp.Status)
 	}
-
-	return nil
-}
-
-type responseWrapper struct {
-	resp gitlab.Response
-	err  error
 }
 
 func (c Clinar) wrapDeleteRegisteredRunnerById(rner gitlab.RunnerDetails, result chan<- responseWrapper, wg *sync.WaitGroup) {
-	logger.Infof("Deleting %d - %s", rner.ID, rner.Name)
-	resp, err := c.Runners.DeleteRegisteredRunnerByID(rner.ID)
+	resp, err := c.Client.DeleteRegisteredRunnerByID(rner.ID)
 	result <- responseWrapper{*resp, err}
 	wg.Done()
 }
 
-type abstractRunnerLocation struct {
-	id   int
-	name string
-}
-
-func (c Clinar) isFilteredOut(locations []abstractRunnerLocation) bool {
+func (c Clinar) isExcluded(locations []abstractRunnerLocation) bool {
 	for _, filter := range c.ExcludeFilter {
 		for _, loc := range locations {
 			if filter == loc.name {
