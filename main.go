@@ -14,16 +14,12 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-var excludeFilter []string
-
-var clinar *internal.Clinar = &internal.Clinar{
-	StaleRunnerIDs: []*gitlab.RunnerDetails{},
-}
+var clinar *internal.Clinar = &internal.Clinar{}
 
 func init() {
-	flag.BoolP(internal.APPROVE, "a", false, "Acknowledge to purge all stale runners")
-	flag.StringArrayVarP(&excludeFilter, "exclude", "e", nil, "Filter out runners with specified groups/projects. Filter can be given by id or name. Exclude takes precedences before include.")
-	flag.StringP(internal.INCLUDE, "i", "", "Regular expression include filter. Matches on project and group names. If runner is set one group or project this runner will be included.")
+	flag.BoolP(APPROVE, "a", false, "Acknowledge to purge all stale runners")
+	flag.StringArrayP(EXCLUDE, "e", nil, "Filter out runners with specified groups/projects. Filter can be given by id or name. Exclude takes precedences before include.")
+	flag.StringP(INCLUDE, "i", "", "Regular expression include filter. Matches on project and group names. If runner is set one group or project this runner will be included.")
 
 	flag.Usage = func() {
 		w := os.Stderr
@@ -54,32 +50,24 @@ Flags:`)
 	}
 
 	flag.Parse()
-	viper.BindPFlags(flag.CommandLine)
-	internal.InitConfig()
+	err := viper.BindPFlags(flag.CommandLine)
+	if err != nil {
+		logger.Fatal(err)
+	}
+	InitConfig()
 }
 
 func main() {
 	var err error
 
-	if viper.GetString(internal.GTILAB_TOKEN) == "" {
+	if viper.GetString(GTILAB_TOKEN) == "" {
 		log.Fatal("GITLAB_TOKEN env var not set")
 	} else {
-		clinar.Client, err = gitlab.NewClient(viper.GetString(internal.GTILAB_TOKEN), gitlab.WithBaseURL(viper.GetString(internal.GITLAB_HOST)))
+		gitLabClient, err := gitlab.NewClient(viper.GetString(GTILAB_TOKEN), gitlab.WithBaseURL(viper.GetString(GITLAB_HOST)))
 		if err != nil {
 			log.Fatalf("Failed to create client: %v", err)
 		}
-	}
-
-	if len(excludeFilter) > 0 {
-		clinar.ExcludeFilter = excludeFilter
-	}
-
-	if viper.GetString(internal.INCLUDE) != "" {
-		rex, err := regexp.Compile(viper.GetString(internal.INCLUDE))
-		if err != nil {
-			panic(err)
-		}
-		clinar.IncludePattern = rex
+		clinar.Client = gitLabClient.Runners
 	}
 
 	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
@@ -88,8 +76,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	if viper.GetBool(internal.APPROVE) {
-		err = clinar.CleanupRunners()
+	if viper.GetBool(APPROVE) {
 		if err != nil {
 			panic(err)
 		}
