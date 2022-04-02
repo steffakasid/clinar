@@ -27,13 +27,11 @@ const (
 	LOG_LEVEL    = "LOG_LEVEL"
 )
 
-func init() {
+func InitConfig() {
 	viper.SetDefault(LOG_LEVEL, "info")
 	viper.SetDefault(GITLAB_HOST, "https://gitlab.com")
 	viper.SetDefault(GTILAB_TOKEN, "")
-}
 
-func InitConfig() {
 	home, err := os.UserHomeDir()
 	cobra.CheckErr(err)
 
@@ -104,6 +102,6 @@ func setLogLevel() {
 	if err == nil {
 		logger.SetLevel(lvl)
 	} else {
-		logger.Error(err)
+		logger.Errorf("setLogLevel: %v", err)
 	}
 }
