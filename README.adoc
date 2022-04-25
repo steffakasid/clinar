@@ -2,8 +2,10 @@
 
 # clinar - A tool to cleanup stale gitlab runners
 
-image:https://github.com/steffakasid/clinar/actions/workflows/release.yml/badge.svg[]
-image:https://github.com/steffakasid/clinar/actions/workflows/codeql-analysis.yml/badge.svg[]
+image:https://img.shields.io/badge/License-Apache%202.0-blue.svg[link="http://www.apache.org/licenses/LICENSE-2.0"]
+image:https://github.com/steffakasid/clinar/actions/workflows/codeql-analysis.yml/badge.svg[link:https://github.com/steffakasid/clinar/actions/workflows/codeql-analysis.yml]
+image:https://github.com/steffakasid/clinar/actions/workflows/release.yml/badge.svg[link:https://github.com/steffakasid/clinar/actions/workflows/release.yml]
+image:https://github.com/steffakasid/clinar/actions/workflows/go-test.yml/badge.svg[link:https://github.com/steffakasid/clinar/actions/workflows/go-test.yml]
 image:coverage_badge.png[]
 
 This tool basically get's all offline runners which a user can administer. If you don't provide the `--approve` flag the tool just shows all runners which are offline with some additional information. After you provide the `--approve` flag all offline runners are deleted.
