@@ -462,6 +462,7 @@ go.mozilla.org/gopgagent v0.0.0-20170926210634-4d7ea76ff71a h1:N7VD+PwpJME2ZfQT8
 go.mozilla.org/gopgagent v0.0.0-20170926210634-4d7ea76ff71a/go.mod h1:YDKUvO0b//78PaaEro6CAPH6NqohCmL2Cwju5XI2HoE=
 go.mozilla.org/sops v0.0.0-20190912205235-14a22d7a7060 h1:KnOZgR0z89tCwGympfPkpzXdlCmhksUP5ddQ+Iqo1FU=
 go.mozilla.org/sops v0.0.0-20190912205235-14a22d7a7060/go.mod h1:StzH0aTTiss59GzhB1wiC9H5dqUqTTDZYfeurUrmJD8=
+go.mozilla.org/sops/v3 v3.7.3/go.mod h1:AutdccISG5Nt/faUigaKPU9aGmhyZuCyUiSx5YCa1O8=
 go.opencensus.io v0.20.1/go.mod h1:6WKK9ahsWS3RSO+PY9ZHZUfv2irvY6gN279GOPZjmmk=
 go.opencensus.io v0.20.2/go.mod h1:6WKK9ahsWS3RSO+PY9ZHZUfv2irvY6gN279GOPZjmmk=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
