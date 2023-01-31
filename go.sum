@@ -522,6 +522,8 @@ github.com/xanzy/go-gitlab v0.78.0 h1:8jUHfQVAprG04Av5g0PxVd3CNsZ5hCbojIax7Hba1m
 github.com/xanzy/go-gitlab v0.78.0/go.mod h1:DlByVTSXhPsJMYL6+cm8e8fTJjeBmhrXdC/yvkKKt6M=
 github.com/xanzy/go-gitlab v0.79.0 h1:mIxGAHJbGkM/eWspvUXA6MgnYKYTFPDcunz2/uEJg1Y=
 github.com/xanzy/go-gitlab v0.79.0/go.mod h1:DlByVTSXhPsJMYL6+cm8e8fTJjeBmhrXdC/yvkKKt6M=
+github.com/xanzy/go-gitlab v0.79.1 h1:ZmEei8RZYlqk4D7nYrWWZqywmKBOd7vmPMlJbueZXUU=
+github.com/xanzy/go-gitlab v0.79.1/go.mod h1:DlByVTSXhPsJMYL6+cm8e8fTJjeBmhrXdC/yvkKKt6M=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
