@@ -8,7 +8,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.4
-	github.com/xanzy/go-gitlab v0.91.0
+	github.com/xanzy/go-gitlab v0.91.1
 	go.mozilla.org/sops/v3 v3.7.3
 )
 
