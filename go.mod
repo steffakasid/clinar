@@ -9,7 +9,7 @@ require (
 	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.4
 	github.com/xanzy/go-gitlab v0.91.1
-	go.mozilla.org/sops/v3 v3.7.3
+	go.mozilla.org/sops/v3 v3.8.0
 )
 
 require (
