@@ -3,7 +3,7 @@ module github.com/steffakasid/clinar
 go 1.19
 
 require (
-	github.com/briandowns/spinner v1.23.0
+	github.com/briandowns/spinner v1.23.1
 	github.com/getsops/sops/v3 v3.8.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/pflag v1.0.5
