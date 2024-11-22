@@ -1,5 +1,5 @@
-# This is an example .goreleaser.yml file with some sensible defaults.
-# Make sure to check the documentation at https://goreleaser.com
+---
+version: 2
 project_name: clinar
 before:
   hooks:
@@ -12,19 +12,18 @@ builds:
       - windows
       - darwin
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
 changelog:
   sort: asc
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
+      - "^docs:"
+      - "^test:"
 # .goreleaser.yaml
 brews:
-  -
-    tap:
+  - tap:
       owner: steffakasid
       name: homebrew-clinar
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
