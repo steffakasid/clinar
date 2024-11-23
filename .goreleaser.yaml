@@ -23,7 +23,7 @@ changelog:
       - "^test:"
 # .goreleaser.yaml
 brews:
-  - tap:
+  - repository:
       owner: steffakasid
       name: homebrew-clinar
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
@@ -35,7 +35,7 @@ brews:
     # The project name and current git tag are used in the format string.
     commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
 
-    folder: Formula
+    directory: Formula
 
     homepage: "https://github.com/steffakasid/clinar"
     description: "This tool can cleanup stale gitlab runners."
