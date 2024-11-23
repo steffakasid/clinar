@@ -13,5 +13,18 @@
       "automerge": true,
       "groupName": "Dependencies (major)"
     }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^.github\/workflows\/.*\\.yml$"
+      ],
+      "matchStrings": [
+        "(?<depName>go)-version: (?<currentValue>.*?)\\s"
+      ],
+      "depNameTemplate": "go",
+      "datasourceTemplate": "golang-version"
+    }
   ]
 }
