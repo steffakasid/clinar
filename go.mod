@@ -6,7 +6,7 @@ toolchain go1.23.4
 
 require (
 	github.com/briandowns/spinner v1.23.1
-	github.com/getsops/sops/v3 v3.9.2
+	github.com/getsops/sops/v3 v3.9.3
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.19.0
@@ -24,7 +24,7 @@ require (
 	cloud.google.com/go/kms v1.20.3 // indirect
 	cloud.google.com/go/longrunning v0.6.3 // indirect
 	cloud.google.com/go/monitoring v1.22.0 // indirect
-	cloud.google.com/go/storage v1.48.0 // indirect
+	cloud.google.com/go/storage v1.49.0 // indirect
 	filippo.io/age v1.2.1 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.16.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.8.0 // indirect
@@ -61,13 +61,13 @@ require (
 	github.com/census-instrumentation/opencensus-proto v0.4.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudflare/circl v1.5.0 // indirect
-	github.com/cncf/xds/go v0.0.0-20241213214725-57cfbe6fad57 // indirect
+	github.com/cncf/xds/go v0.0.0-20241223141626-cff3c89139a3 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.6 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/envoyproxy/go-control-plane v0.13.1 // indirect
 	github.com/envoyproxy/protoc-gen-validate v1.1.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
-	github.com/getsops/gopgagent v0.0.0-20240527072608-0c14999532fe // indirect
+	github.com/getsops/gopgagent v0.0.0-20241224165529-7044f28e491e // indirect
 	github.com/go-jose/go-jose/v4 v4.0.4 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -118,9 +118,9 @@ require (
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/term v0.27.0 // indirect
 	google.golang.org/api v0.214.0 // indirect
-	google.golang.org/genproto v0.0.0-20241219192143-6b3ec007d9bb // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20241219192143-6b3ec007d9bb // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241219192143-6b3ec007d9bb // indirect
+	google.golang.org/genproto v0.0.0-20241223144023-3abc09e42ca8 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20241223144023-3abc09e42ca8 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20241223144023-3abc09e42ca8 // indirect
 	google.golang.org/grpc v1.69.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
@@ -145,6 +145,6 @@ require (
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
-	google.golang.org/protobuf v1.36.0 // indirect
+	google.golang.org/protobuf v1.36.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 )
