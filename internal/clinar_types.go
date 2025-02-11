@@ -1,6 +1,6 @@
 package internal
 
-import "github.com/xanzy/go-gitlab"
+import gitlab "gitlab.com/gitlab-org/api/client-go"
 
 type responseWrapper struct {
 	resp gitlab.Response

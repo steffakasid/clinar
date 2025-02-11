@@ -11,7 +11,7 @@ import (
 	logrusTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/steffakasid/clinar/mocks"
 	"github.com/stretchr/testify/assert"
-	"github.com/xanzy/go-gitlab"
+	gitlab "gitlab.com/gitlab-org/api/client-go"
 )
 
 func TestGetRunnerDetails(t *testing.T) {
