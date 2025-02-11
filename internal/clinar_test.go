@@ -11,6 +11,7 @@ import (
 	logrusTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/steffakasid/clinar/mocks"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	gitlab "gitlab.com/gitlab-org/api/client-go"
 )
 
@@ -104,7 +105,7 @@ func TestGetAllRunners(t *testing.T) {
 		mockListRunners(mock, 1)
 		clinar := Clinar{Client: mock, Logger: logger}
 		rners, err := clinar.GetAllRunners()
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Len(t, rners, 10)
 		mock.AssertExpectations(t)
 	})
@@ -115,8 +116,11 @@ func TestGetAllRunners(t *testing.T) {
 		mockListRunners(mock, 10)
 		clinar := Clinar{Client: mock, Logger: logger}
 		rners, err := clinar.GetAllRunners()
-		assert.NoError(t, err)
-		assert.Len(t, rners, 100)
+		require.NoError(t, err)
+		require.Len(t, rners, 100)
+		assertRunnerIDContained(t, rners, 50)
+		assertRunnerIDContained(t, rners, 75)
+		assertRunnerIDContained(t, rners, 100)
 		mock.AssertExpectations(t)
 	})
 
@@ -138,7 +142,7 @@ func TestGetAllRunners(t *testing.T) {
 		mockListRunners(mock, 10, 3)
 		clinar := Clinar{Client: mock, Logger: logger}
 		rners, err := clinar.GetAllRunners()
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Len(t, rners, 90)
 		assert.Len(t, logHook.Entries, 1)
 		assert.Contains(t, logHook.Entries[0].Message, "Something went wrong 3")
@@ -229,7 +233,7 @@ func mockListRunners(mock *mocks.GitLabClient, numOfCalls int, errorAt ...int) {
 				PerPage: 100,
 				Page:    i,
 			},
-			Status: gitlab.String(runnerState),
+			Status: gitlab.Ptr(runnerState),
 		}
 		baseId := 10 * i
 		rners := []*gitlab.Runner{}
@@ -268,4 +272,13 @@ func mockDeleteRegisteredRunnerByID(mock *mocks.GitLabClient, numOfCalls int) {
 	for i := 1; i <= numOfCalls; i++ {
 		mock.EXPECT().DeleteRegisteredRunnerByID(i).Return(&gitlab.Response{Response: &http.Response{Status: "200 OK"}}, nil)
 	}
+}
+
+func assertRunnerIDContained(t *testing.T, runners []*gitlab.Runner, id int) {
+	for _, r := range runners {
+		if r.ID == id {
+			return
+		}
+	}
+	t.Errorf("Runner with ID %d not found", id)
 }
