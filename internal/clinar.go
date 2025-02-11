@@ -60,7 +60,7 @@ func (c *Clinar) GetAllRunners() ([]*gitlab.Runner, error) {
 			PerPage: 100,
 			Page:    1,
 		},
-		Status: gitlab.String(runnerState),
+		Status: gitlab.Ptr(runnerState),
 	}
 
 	rners, resp, err := c.Client.ListRunners(opts)
