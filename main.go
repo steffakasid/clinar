@@ -14,7 +14,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-var clinar *internal.Clinar = &internal.Clinar{Logger: logrus.New()}
+var clinar *internal.Clinar = &internal.Clinar{Logger: logrus.StandardLogger()}
 
 func init() {
 	flag.BoolP(APPROVE, "a", false, "Acknowledge to purge all stale runners")
