@@ -83,7 +83,7 @@ func (c *Clinar) GetAllRunners() ([]*gitlab.Runner, error) {
 		if rnerResult.err != nil {
 			c.Logger.Error(rnerResult.err)
 		} else {
-			runners = append(runners, rners...)
+			runners = append(runners, rnerResult.rners...)
 		}
 	}
 
