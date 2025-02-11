@@ -59,7 +59,7 @@ func InitConfig() {
 				logger.Fatal(err)
 			} else {
 				setLogLevel()
-				logger.Debug("Using sops encrypted config file:", viper.ConfigFileUsed())
+				logger.Debug("Using sops encrypted config file:", usedConfigFile)
 			}
 		}
 	} else {
