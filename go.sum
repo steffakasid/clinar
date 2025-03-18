@@ -331,6 +331,8 @@ gitlab.com/gitlab-org/api/client-go v0.124.0 h1:6i/uAl3QZur0F4S+42d9/k8y1Lf+htPq
 gitlab.com/gitlab-org/api/client-go v0.124.0/go.mod h1:Jh0qjLILEdbO6z/OY94RD+3NDQRUKiuFSFYozN6cpKM=
 gitlab.com/gitlab-org/api/client-go v0.125.0 h1:T+L13tpjE1s3Hkqyq+ontvYVSwRyMlfOLDd75IiRY5g=
 gitlab.com/gitlab-org/api/client-go v0.125.0/go.mod h1:SEN5CKASOsKoA6rv6Y3cPiM5ikH2HxFaqCUwZOquttI=
+gitlab.com/gitlab-org/api/client-go v0.126.0 h1:VV5TdkF6pMbEdFGvbR2CwEgJwg6qdg1u3bj5eD2tiWk=
+gitlab.com/gitlab-org/api/client-go v0.126.0/go.mod h1:bYC6fPORKSmtuPRyD9Z2rtbAjE7UeNatu2VWHRf4/LE=
 go.opencensus.io v0.24.0 h1:y73uSU6J157QMP2kn2r30vwW1A2W2WFwSCGnAVxeaD0=
 go.opencensus.io v0.24.0/go.mod h1:vNK8G9p7aAivkbmorf4v+7Hgx+Zs0yY+0fOtgBfjQKo=
 go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJySYA=
