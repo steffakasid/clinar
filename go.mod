@@ -1,6 +1,6 @@
 module github.com/steffakasid/clinar
 
-go 1.25.6
+go 1.25.7
 
 require (
 	github.com/briandowns/spinner v1.23.2
