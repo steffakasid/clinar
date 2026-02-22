@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/briandowns/spinner v1.23.2
-	github.com/getsops/sops/v3 v3.12.0
+	github.com/getsops/sops/v3 v3.12.1
 	github.com/sirupsen/logrus v1.9.4
 	github.com/spf13/pflag v1.0.10
 	github.com/spf13/viper v1.21.0
