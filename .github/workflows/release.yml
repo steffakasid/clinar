@@ -2,9 +2,9 @@
 name: goreleaser
 
 on:
-  push:
-    tags:
-      - '*'
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron: "0 0 2 * *"
 
 permissions:
   contents: write
@@ -13,26 +13,18 @@ jobs:
   goreleaser:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - name: Checkout
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      -
-        name: Set up Go
+      - name: Set up Go
         uses: actions/setup-go@v6
         with:
           go-version: 1.26.0
-      -
-        name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
+      - uses: go-semantic-release/action@v1
         with:
-          # either 'goreleaser' (default) or 'goreleaser-pro'
-          distribution: goreleaser
-          version: 2.0
-          args: release --clean
+          changelog-generator-opt: "emojis=true"
+          hooks: goreleaser
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
-          # Your GoReleaser Pro key, if you are using the 'goreleaser-pro' distribution
-          # GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
