@@ -7,23 +7,11 @@
   ],
   "packageRules": [
     {
-      "matchUpdateTypes": [
-        "minor",
-        "patch",
-        "pin",
-        "digest"
+      "matchFileNames": [
+        "!.github/**"
       ],
-      "automerge": true,
-      "groupName": "Dependencies (non-major)",
-      "groupSlug": "non-major"
-    },
-    {
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "automerge": true,
-      "groupName": "Dependencies (major)",
-      "groupSlug": "major"
+      "semanticCommitType": "fix",
+      "semanticCommitScope": "deps"
     },
     {
       "matchDatasources": ["golang-version"],
